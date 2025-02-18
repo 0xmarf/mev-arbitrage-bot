@@ -1,112 +1,29 @@
-# Ethereum MEV Arbitrage Bot
+simple-arbitrage
+================
+This repository contains a simple, mechanical system for discovering, evaluating, rating, and submitting arbitrage opportunities to the Flashbots bundle endpoint. This script is very unlikely to be profitable, as many users have access to it, and it is targeting well-known Ethereum opportunities.
 
-A sophisticated Ethereum arbitrage bot designed to identify and execute profitable trades across decentralized exchanges (DEXes), specifically focusing on Uniswap V2 and its forks. The bot leverages Flashbots to submit transaction bundles, mitigating front-running risks and potentially increasing the chances of successful arbitrage execution.
+We hope you will use this repository as an example of how to integrate Flashbots into your own Flashbot searcher (bot). For more information, see the [Flashbots Searcher FAQ](https://docs.flashbots.net/flashbots-auction/searchers/faq)
 
-## Key Features
+Environment Variables
+=====================
+- **ETHEREUM_RPC_URL** - Ethereum RPC endpoint. Can not be the same as FLASHBOTS_RPC_URL
+- **PRIVATE_KEY** - Private key for the Ethereum EOA that will be submitting Flashbots Ethereum transactions
+- **FLASHBOTS_RELAY_SIGNING_KEY** _[Optional, default: random]_ - Flashbots submissions require an Ethereum private key to sign transaction payloads. This newly-created account does not need to hold any funds or correlate to any on-chain activity, it just needs to be used across multiple Flashbots RPC requests to identify requests related to same searcher. Please see https://docs.flashbots.net/flashbots-auction/searchers/faq#do-i-need-authentication-to-access-the-flashbots-relay
+- **HEALTHCHECK_URL** _[Optional]_ - Health check URL, hit only after successfully submitting a bundle.
+- **MINER_REWARD_PERCENTAGE** _[Optional, default 80]_ - 0 -> 100, what percentage of overall profitability to send to miner.
 
-- **Market Monitoring**: Monitors multiple Uniswap V2-style DEXes for price discrepancies
-- **Real-time Updates**: Supports both polling and WebSocket connections for market data
-- **Flash Loan Integration**: Uses Aave V3 flash loans for capital-efficient arbitrage
-- **Flashbots Integration**: Protects trades from front-running via Flashbots bundles
-- **Gas Optimization**: Dynamic gas price adjustment based on network conditions
-- **Circuit Breaker**: Prevents excessive failed transactions
-- **Extensive Logging**: Detailed operation and error logging
+Usage
+======================
+1. Generate a new bot wallet address and extract the private key into a raw 32-byte format.
+2. Deploy the included BundleExecutor.sol to Ethereum, from a secured account, with the address of the newly created wallet as the constructor argument
+3. Transfer WETH to the newly deployed BundleExecutor
 
-## Prerequisites
+_It is important to keep both the bot wallet private key and bundleExecutor owner private key secure. The bot wallet attempts to not lose WETH inside an arbitrage, but a malicious user would be able to drain the contract._
 
-- Node.js (v14 or higher)
-- npm or yarn
-- An Ethereum node (RPC endpoint)
-- Flashbots relay access
-- (Optional) WebSocket-enabled Ethereum node
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/0xmarf/mev-arbitrage-bot.git
-cd mev-arbitrage-bot
 ```
-
-2. Install dependencies:
-```bash
-npm install
+$ npm install
+$ PRIVATE_KEY=__PRIVATE_KEY_FROM_ABOVE__ \
+    BUNDLE_EXECUTOR_ADDRESS=__DEPLOYED_ADDRESS_FROM_ABOVE__ \
+    FLASHBOTS_RELAY_SIGNING_KEY=__RANDOM_ETHEREUM_PRIVATE_KEY__ \
+      npm run start
 ```
-
-3. Create a `.env` file in the root directory:
-```env
-ETHEREUM_RPC_URL=your_ethereum_rpc_url
-WEBSOCKET_URL=your_websocket_url  # Optional
-PRIVATE_KEY=your_private_key
-FLASHBOTS_RELAY_SIGNING_KEY=your_flashbots_key
-```
-
-## Configuration
-
-Adjust the following configuration files according to your needs:
-
-- `src/config/config.ts`: Main configuration parameters
-- `src/config/thresholds.ts`: Market filtering thresholds
-- `hardhat.config.ts`: Network configuration for contract deployment
-
-## Usage
-
-### Standard JSON-RPC Mode
-```bash
-npm run start
-```
-
-### WebSocket Mode
-```bash
-npm run start:ws
-```
-
-### MEV-Share Mode
-```bash
-npm run start:mevshare
-```
-
-### Deploy Contracts
-```bash
-npx hardhat run scripts/deploy.ts --network <network>
-```
-
-## Architecture
-
-The bot consists of several key components:
-
-- **Smart Contracts**: `BundleExecutor.sol` and `FlashLoanExecutor.sol`
-- **Market Monitoring**: `UniswapV2EthPair.ts` and WebSocket manager
-- **Arbitrage Logic**: `Arbitrage.ts` and optimization algorithms
-- **Services**: MEV-Share, Multicall, and Cache services
-- **Utilities**: Circuit breaker, gas price manager, and logging
-
-## Testing
-
-Run the test suite:
-```bash
-npm test
-```
-
-## Security
-
-- Never commit private keys or sensitive data
-- Use environment variables for sensitive configuration
-- Regularly update dependencies
-- Consider running security audits before mainnet deployment
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Disclaimer
-
-This software is for educational purposes only. Use at your own risk. The authors take no responsibility for financial losses incurred through the use of this software. 

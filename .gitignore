@@ -1,5 +1,6 @@
 # Dependencies
-node_modules/
+node_modules/*
+!node_modules/.gitkeep
 npm-debug.log
 yarn-debug.log
 yarn-error.log
@@ -10,8 +11,10 @@ yarn-error.log
 .env.*.local
 
 # Build output
-dist/
-build/
+dist/*
+!dist/.gitkeep
+build/*
+!build/.gitkeep
 *.tsbuildinfo
 
 # IDE
@@ -24,11 +27,13 @@ build/
 .DS_Store
 Thumbs.db
 
-# Hardhat
-cache/
-artifacts/
-typechain/
-typechain-types/
+# Hardhat files
+cache/*
+!cache/.gitkeep
+artifacts/*
+!artifacts/.gitkeep
+typechain-types/*
+!typechain-types/.gitkeep
 
 # Coverage
 coverage/
