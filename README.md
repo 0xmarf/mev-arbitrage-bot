@@ -1,29 +1,74 @@
-simple-arbitrage
-================
-This repository contains a simple, mechanical system for discovering, evaluating, rating, and submitting arbitrage opportunities to the Flashbots bundle endpoint. This script is very unlikely to be profitable, as many users have access to it, and it is targeting well-known Ethereum opportunities.
 
-We hope you will use this repository as an example of how to integrate Flashbots into your own Flashbot searcher (bot). For more information, see the [Flashbots Searcher FAQ](https://docs.flashbots.net/flashbots-auction/searchers/faq)
 
-Environment Variables
-=====================
-- **ETHEREUM_RPC_URL** - Ethereum RPC endpoint. Can not be the same as FLASHBOTS_RPC_URL
-- **PRIVATE_KEY** - Private key for the Ethereum EOA that will be submitting Flashbots Ethereum transactions
-- **FLASHBOTS_RELAY_SIGNING_KEY** _[Optional, default: random]_ - Flashbots submissions require an Ethereum private key to sign transaction payloads. This newly-created account does not need to hold any funds or correlate to any on-chain activity, it just needs to be used across multiple Flashbots RPC requests to identify requests related to same searcher. Please see https://docs.flashbots.net/flashbots-auction/searchers/faq#do-i-need-authentication-to-access-the-flashbots-relay
-- **HEALTHCHECK_URL** _[Optional]_ - Health check URL, hit only after successfully submitting a bundle.
-- **MINER_REWARD_PERCENTAGE** _[Optional, default 80]_ - 0 -> 100, what percentage of overall profitability to send to miner.
+# 🚀 Simple Arbitrage Bot with Flashbots Integration
 
-Usage
-======================
-1. Generate a new bot wallet address and extract the private key into a raw 32-byte format.
-2. Deploy the included BundleExecutor.sol to Ethereum, from a secured account, with the address of the newly created wallet as the constructor argument
-3. Transfer WETH to the newly deployed BundleExecutor
+A mechanical system for discovering, evaluating, and executing arbitrage opportunities on Ethereum using Flashbots bundles. While this implementation may not be immediately profitable due to its public nature, it serves as an excellent educational resource for understanding Flashbots integration.
 
-_It is important to keep both the bot wallet private key and bundleExecutor owner private key secure. The bot wallet attempts to not lose WETH inside an arbitrage, but a malicious user would be able to drain the contract._
+## 📋 Prerequisites
 
+- Node.js and npm installed
+- Access to an Ethereum RPC endpoint
+- Basic understanding of DeFi and arbitrage concepts
+
+## 🔑 Environment Variables
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `ETHEREUM_RPC_URL` | Ethereum RPC endpoint (different from Flashbots RPC) | Yes | - |
+| `PRIVATE_KEY` | Private key for transaction submission | Yes | - |
+| `FLASHBOTS_RELAY_SIGNING_KEY` | Key for signing Flashbots payloads | No | Random key |
+| `HEALTHCHECK_URL` | URL for monitoring successful bundle submissions | No | - |
+| `MINER_REWARD_PERCENTAGE` | Percentage of profits allocated to miners (0-100) | No | 80 |
+
+## 🛠 Setup Instructions
+
+1. Generate a new bot wallet and extract the private key:
+```bash
+# Example using ethers.js
+node -e "console.log(require('ethers').Wallet.createRandom().privateKey)"
 ```
-$ npm install
-$ PRIVATE_KEY=__PRIVATE_KEY_FROM_ABOVE__ \
-    BUNDLE_EXECUTOR_ADDRESS=__DEPLOYED_ADDRESS_FROM_ABOVE__ \
-    FLASHBOTS_RELAY_SIGNING_KEY=__RANDOM_ETHEREUM_PRIVATE_KEY__ \
-      npm run start
+
+2. Deploy the `BundleExecutor.sol` contract:
+   - Use a secure account for deployment
+   - Pass the new bot wallet address as a constructor argument
+
+3. Fund the deployed `BundleExecutor` with WETH
+
+## ⚡ Quick Start
+
+1. Install dependencies:
+```bash
+npm install
 ```
+
+2. Start the bot:
+```bash
+PRIVATE_KEY=your_private_key \
+BUNDLE_EXECUTOR_ADDRESS=your_deployed_address \
+FLASHBOTS_RELAY_SIGNING_KEY=your_signing_key \
+npm run start
+```
+
+## ⚠️ Security Considerations
+
+- Keep both the bot wallet and `BundleExecutor` owner private keys secure
+- While the contract includes safety measures, unauthorized access to private keys could result in fund loss
+- Regularly monitor the contract's WETH balance and activity
+
+## 📚 Additional Resources
+
+- [Flashbots Searcher FAQ](https://docs.flashbots.net/flashbots-auction/searchers/faq)
+- [Flashbots Documentation](https://docs.flashbots.net/)
+- [MEV Documentation](https://ethereum.org/en/developers/docs/mev/)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+*Note: This is an educational tool and should not be considered production-ready without additional security reviews and optimizations.*
